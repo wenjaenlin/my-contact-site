@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>聯絡我們</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="contact-card">
+      <div class="hero">
+        <p class="eyebrow">Contact</p>
+        <h1>聯絡我們</h1>
+        <p class="intro">
+          有任何合作提案、問題或建議，歡迎留下訊息給我們。
+          我們會仔細閱讀每一則留言，並盡快與你聯繫。
+        </p>
+      </div>
+
+      <form
+        id="contact-form"
+        class="contact-form"
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden-field">
+          <label>
+            請不要填寫這個欄位：
+            <input name="bot-field">
+          </label>
+        </p>
+
+        <label class="field">
+          <span>姓名</span>
+          <input type="text" name="name" placeholder="請輸入你的姓名" required>
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" placeholder="name@example.com" required>
+        </label>
+
+        <label class="field">
+          <span>留言內容</span>
+          <textarea name="message" rows="6" placeholder="想和我們說些什麼呢？" required></textarea>
+        </label>
+
+        <button type="submit" class="submit-button">送出留言</button>
+        <p id="form-status" class="form-status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
