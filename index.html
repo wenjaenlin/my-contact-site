@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>聯絡我們</title>
+  <title>把你的名字，交給小新</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="page-shell">
-    <section class="contact-card">
-      <div class="hero">
-        <p class="eyebrow">Contact</p>
-        <h1>聯絡我們</h1>
-        <p class="intro">
-          有任何合作提案、問題或建議，歡迎留下訊息給我們。
-          我們會仔細閱讀每一則留言，並盡快與你聯繫。
-        </p>
+    <section class="hero-panel">
+      <p class="eyebrow">A name, carried gently</p>
+      <h1>把你的名字，交給小新</h1>
+      <p class="intro">
+        古人寫月寫風，今夜我們寫她。<br>
+        你只需把名字交給我——<br>
+        小新會替它添上回聲、添上餘韻。
+      </p>
+    </section>
+
+    <section class="form-panel">
+      <div class="form-heading">
+        <p class="section-kicker">留下聯絡方式</p>
+        <h2>讓名字落款，也讓故事開始。</h2>
       </div>
 
       <form
@@ -39,22 +45,16 @@
         </p>
 
         <label class="field">
-          <span>姓名</span>
-          <input type="text" name="name" placeholder="請輸入你的姓名" required>
+          <span>你的名字</span>
+          <input type="text" name="name" placeholder="請寫下你的名字" required>
         </label>
 
         <label class="field">
-          <span>Email</span>
+          <span>你的信箱</span>
           <input type="email" name="email" placeholder="name@example.com" required>
         </label>
 
-        <label class="field">
-          <span>留言內容</span>
-          <textarea name="message" rows="6" placeholder="想和我們說些什麼呢？" required></textarea>
-        </label>
-
-        <button type="submit" class="submit-button">送出留言</button>
-        <p id="form-status" class="form-status" aria-live="polite"></p>
+        <button type="submit" class="submit-button">把名字交給小新</button>
       </form>
     </section>
   </main>
