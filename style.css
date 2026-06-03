@@ -129,37 +129,54 @@ h2 {
   transform: translateY(-1px);
 }
 
-.submit-button {
+.submit-button,
+.secondary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: fit-content;
   min-width: 240px;
-  border: 0;
   border-radius: 999px;
   padding: 17px 28px;
   font: inherit;
   font-weight: 700;
-  color: #fffdf9;
-  background: linear-gradient(135deg, #6c4730, #aa7b4f);
-  box-shadow: 0 14px 30px rgba(108, 71, 48, 0.18);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
-.submit-button:hover {
+.submit-button {
+  border: 0;
+  color: #fffdf9;
+  background: linear-gradient(135deg, #6c4730, #aa7b4f);
+  box-shadow: 0 14px 30px rgba(108, 71, 48, 0.18);
+}
+
+.submit-button:hover,
+.secondary-button:hover {
   transform: translateY(-2px);
+}
+
+.submit-button:hover {
   box-shadow: 0 18px 34px rgba(108, 71, 48, 0.22);
 }
 
-.submit-button:active {
+.submit-button:active,
+.secondary-button:active {
   transform: translateY(0);
 }
 
-.submit-button:disabled {
+.submit-button:disabled,
+.secondary-button:disabled {
   opacity: 0.75;
   cursor: wait;
+}
+
+.secondary-button {
+  border: 1px solid rgba(141, 95, 60, 0.24);
+  color: var(--accent-color);
+  background: rgba(255, 249, 242, 0.9);
+  box-shadow: 0 10px 24px rgba(108, 71, 48, 0.1);
 }
 
 .result-panel {
@@ -172,17 +189,21 @@ h2 {
 
 .result-placeholder,
 .result-loading,
-.result-error {
+.result-error,
+.image-loading,
+.image-error {
   margin: 0;
   font-size: 1rem;
   line-height: 1.9;
 }
 
-.result-loading {
+.result-loading,
+.image-loading {
   color: var(--accent-color);
 }
 
-.result-error {
+.result-error,
+.image-error {
   color: #9b3d29;
 }
 
@@ -204,7 +225,32 @@ h2 {
   line-height: 2;
 }
 
-.hidden-field {
+.image-actions {
+  margin-top: 28px;
+}
+
+.image-panel {
+  margin-top: 28px;
+}
+
+.image-card {
+  border: 1px solid rgba(141, 95, 60, 0.14);
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 40px rgba(66, 45, 26, 0.08);
+}
+
+.generated-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.hidden-field,
+.hidden {
   display: none;
 }
 
@@ -234,6 +280,7 @@ h2 {
   }
 
   .submit-button,
+  .secondary-button,
   .back-link {
     width: 100%;
     min-width: 0;
