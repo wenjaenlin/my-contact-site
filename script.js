@@ -118,7 +118,7 @@ function renderPoem(name, poem) {
 function renderImageLoading() {
   imagePanel.classList.remove("hidden");
   imagePanel.setAttribute("aria-busy", "true");
-  imageContent.innerHTML = '<p class="image-loading">小杜正在把詩畫成一張明信片……</p>';
+  imageContent.innerHTML = '<p class="image-loading">小新正在把詩畫成一張明信片……</p>';
 }
 
 function renderImageError(message) {
