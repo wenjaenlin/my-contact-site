@@ -63,14 +63,13 @@ exports.handler = async function handler(event) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "GPT-Image-1.5",
+        model: "gpt-image-1.5",
         messages: [
           {
             role: "user",
             content: prompt
           }
         ],
-        max_tokens: 120,
         stream: false
       })
     });
@@ -90,7 +89,7 @@ exports.handler = async function handler(event) {
     }
 
     const content = data.choices?.[0]?.message?.content?.trim() || "";
-    const match = content.match(/!\[[^\]]*\]\((https?:[^)]+)\)/i) || content.match(/(https?:\/\/\S+)/i);
+    const match = content.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/i) || content.match(/(https?:\/\/\S+)/i);
     const imageUrl = match?.[1] || match?.[0] || "";
 
     if (!imageUrl) {
@@ -99,7 +98,9 @@ exports.handler = async function handler(event) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ error: "The image model did not return an image URL." })
+        body: JSON.stringify({
+          error: content || "The image model did not return an image URL."
+        })
       };
     }
 
