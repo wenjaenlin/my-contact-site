@@ -104,7 +104,11 @@ form.addEventListener("submit", async (event) => {
   if (poemResult.status === "fulfilled") {
     renderPoem(name, poemResult.value);
   } else {
-    renderError("詩句暫時還沒落下來，請稍後再試一次。");
+    const message = poemResult.reason instanceof Error
+      ? poemResult.reason.message
+      : "詩句暫時還沒落下來，請稍後再試一次。";
+
+    renderError(message);
     console.error(poemResult.reason);
   }
 
