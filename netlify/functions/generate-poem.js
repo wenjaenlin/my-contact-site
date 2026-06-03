@@ -57,11 +57,38 @@ exports.handler = async function handler(event) {
   }
 
   const prompt = [
-    `請以「${name}」為核心，寫一首繁體中文新詩。`,
-    "風格要現代、溫柔，並帶一點古典意象，例如月色、風、潮汐、燈影、庭院、紙窗，但不要過度堆砌。",
-    "詩要像是在對這個名字低聲說話。",
-    "全詩 8 到 12 行，每行盡量簡短。",
-    "不要加標題、不要加引號、不要解釋。",
+    `請以「${name}」創作一首繁體中文藏頭新詩。`,
+    "",
+    "這首詩不是介紹這個名字，而是描寫這個名字在現代城市裡留下的痕跡。",
+    "",
+    "規則：",
+    "",
+    "- 必須使用藏頭形式。",
+    `- 「${name}」每個字依序出現在對應行的第一個字。`,
+    "- 藏頭行必須自然。",
+    "",
+    "風格：",
+    "",
+    "- 現代中文新詩。",
+    "- 像詩人深夜經過城市時寫下的片段。",
+    "- 溫柔、有畫面感、有餘韻。",
+    "- 避免老派祝福語與勵志語錄。",
+    "- 避免生成像生日賀卡或姓名學分析。",
+    "",
+    "內容：",
+    "",
+    "優先使用現代生活意象：",
+    "",
+    "咖啡店、捷運、便利商店、手機訊息、辦公桌、耳機、紅綠燈、深夜街道、電梯、車站、書店、外送袋、雨天通勤、城市燈光。",
+    "",
+    "自然意象僅能少量點綴，不得成為主要內容。",
+    "",
+    "長度：",
+    "",
+    "8~12行。",
+    "",
+    "輸出：",
+    "",
     "只輸出詩本身。"
   ].join("\n");
 
@@ -77,14 +104,14 @@ exports.handler = async function handler(event) {
         messages: [
           {
             role: "system",
-            content: "You are a careful poet who writes in Traditional Chinese with gentle, luminous imagery."
+            content: "You are a careful poet who writes in Traditional Chinese with gentle, cinematic urban imagery and follows acrostic constraints precisely."
           },
           {
             role: "user",
             content: prompt
           }
         ],
-        max_tokens: 280
+        max_tokens: 320
       })
     });
 
