@@ -38,6 +38,16 @@ async function submitToNetlify(formData) {
   }
 }
 
+async function parseJsonSafely(response) {
+  const text = await response.text();
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
+}
+
 async function generatePoem(name) {
   const response = await fetch("/.netlify/functions/generate-poem", {
     method: "POST",
@@ -47,10 +57,10 @@ async function generatePoem(name) {
     body: JSON.stringify({ name })
   });
 
-  const data = await response.json();
+  const data = await parseJsonSafely(response);
 
   if (!response.ok) {
-    throw new Error(data.error || "Poem generation failed.");
+    throw new Error(data.error || data.raw || "Poem generation failed.");
   }
 
   return data.poem;
@@ -65,10 +75,10 @@ async function generateImage(poem) {
     body: JSON.stringify({ poem })
   });
 
-  const data = await response.json();
+  const data = await parseJsonSafely(response);
 
   if (!response.ok) {
-    throw new Error(data.error || "Image generation failed.");
+    throw new Error(data.error || data.raw || "Image generation failed.");
   }
 
   return data.imageUrl;
