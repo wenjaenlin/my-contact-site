@@ -49,7 +49,7 @@ async function parseJsonSafely(response) {
 }
 
 async function generatePoem(name) {
-  const response = await fetch("/.netlify/functions/generate-poem", {
+  const response = await fetch("/api/generate-poem", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -67,7 +67,7 @@ async function generatePoem(name) {
 }
 
 async function generateImage(poem) {
-  const response = await fetch("/.netlify/functions/generate-image", {
+  const response = await fetch("/api/generate-image", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
