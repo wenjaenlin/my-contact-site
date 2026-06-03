@@ -1,3 +1,45 @@
+function extractImageUrl(data) {
+  const content = data?.choices?.[0]?.message?.content;
+
+  if (typeof content === "string") {
+    const markdownMatch = content.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/i);
+    if (markdownMatch?.[1]) {
+      return { imageUrl: markdownMatch[1], raw: content };
+    }
+
+    const urlMatch = content.match(/(https?:\/\/\S+)/i);
+    if (urlMatch?.[1]) {
+      return { imageUrl: urlMatch[1], raw: content };
+    }
+
+    return { imageUrl: "", raw: content };
+  }
+
+  if (Array.isArray(content)) {
+    for (const item of content) {
+      if (item?.type === "image_url" && item.image_url?.url) {
+        return { imageUrl: item.image_url.url, raw: JSON.stringify(content) };
+      }
+
+      if (item?.type === "output_text" && typeof item.text === "string") {
+        const markdownMatch = item.text.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/i);
+        if (markdownMatch?.[1]) {
+          return { imageUrl: markdownMatch[1], raw: item.text };
+        }
+
+        const urlMatch = item.text.match(/(https?:\/\/\S+)/i);
+        if (urlMatch?.[1]) {
+          return { imageUrl: urlMatch[1], raw: item.text };
+        }
+      }
+    }
+
+    return { imageUrl: "", raw: JSON.stringify(content) };
+  }
+
+  return { imageUrl: "", raw: JSON.stringify(data) };
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
@@ -70,11 +112,22 @@ exports.handler = async function handler(event) {
             content: prompt
           }
         ],
-        stream: false
+        stream: false,
+        extra_body: {
+          quality: "medium",
+          aspect_ratio: "2:3"
+        }
       })
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { raw: responseText };
+    }
 
     if (!response.ok) {
       return {
@@ -83,14 +136,12 @@ exports.handler = async function handler(event) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: data.error?.message || "Poe image request failed."
+          error: data.error?.message || data.error || data.raw || "Poe image request failed."
         })
       };
     }
 
-    const content = data.choices?.[0]?.message?.content?.trim() || "";
-    const match = content.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/i) || content.match(/(https?:\/\/\S+)/i);
-    const imageUrl = match?.[1] || match?.[0] || "";
+    const { imageUrl, raw } = extractImageUrl(data);
 
     if (!imageUrl) {
       return {
@@ -99,7 +150,7 @@ exports.handler = async function handler(event) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: content || "The image model did not return an image URL."
+          error: raw || "The image model did not return an image URL."
         })
       };
     }
