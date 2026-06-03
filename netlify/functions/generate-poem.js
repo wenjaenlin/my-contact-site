@@ -73,7 +73,7 @@ exports.handler = async function handler(event) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-5.5",
+        model: "GPT-5.4",
         messages: [
           {
             role: "system",
