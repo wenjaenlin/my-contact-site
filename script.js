@@ -121,10 +121,10 @@ function renderImageLoading() {
   imageContent.innerHTML = '<p class="image-loading">小杜正在把詩畫成一張明信片……</p>';
 }
 
-function renderImageError() {
+function renderImageError(message) {
   imagePanel.classList.remove("hidden");
   imagePanel.setAttribute("aria-busy", "false");
-  imageContent.innerHTML = '<p class="image-error">圖片生成失敗，請稍後再試。</p>';
+  imageContent.innerHTML = `<p class="image-error">${escapeHtml(message)}</p>`;
 }
 
 function renderImage(imageUrl) {
@@ -191,7 +191,11 @@ generateImageButton.addEventListener("click", async () => {
     const imageUrl = await generateImage(latestPoem);
     renderImage(imageUrl);
   } catch (error) {
-    renderImageError();
+    const message = error instanceof Error
+      ? error.message
+      : "圖片生成失敗，請稍後再試。";
+
+    renderImageError(message);
     console.error(error);
   } finally {
     generateImageButton.disabled = false;
