@@ -3,6 +3,13 @@ const nameInput = document.getElementById("name-input");
 const submitButton = form.querySelector('button[type="submit"]');
 const resultPanel = document.getElementById("result-panel");
 const resultContent = document.getElementById("result-content");
+const imageActions = document.getElementById("image-actions");
+const generateImageButton = document.getElementById("generate-image-button");
+const imagePanel = document.getElementById("image-panel");
+const imageContent = document.getElementById("image-content");
+
+let latestPoem = "";
+let latestName = "";
 
 function escapeHtml(text) {
   return text
@@ -49,14 +56,41 @@ async function generatePoem(name) {
   return data.poem;
 }
 
+async function generateImage(poem) {
+  const response = await fetch("/.netlify/functions/generate-image", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ poem })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Image generation failed.");
+  }
+
+  return data.imageUrl;
+}
+
+function hideImageSection() {
+  imageActions.classList.add("hidden");
+  imagePanel.classList.add("hidden");
+  imagePanel.setAttribute("aria-busy", "false");
+  imageContent.innerHTML = "";
+}
+
 function renderLoading() {
   resultPanel.setAttribute("aria-busy", "true");
   resultContent.innerHTML = '<p class="result-loading">小新正在為你寫詩……</p>';
+  hideImageSection();
 }
 
 function renderError(message) {
   resultPanel.setAttribute("aria-busy", "false");
   resultContent.innerHTML = `<p class="result-error">${escapeHtml(message)}</p>`;
+  hideImageSection();
 }
 
 function renderPoem(name, poem) {
@@ -67,11 +101,38 @@ function renderPoem(name, poem) {
     .map((line) => `<p class="poem-line">${escapeHtml(line)}</p>`)
     .join("");
 
+  latestPoem = poem;
+  latestName = name;
   resultPanel.setAttribute("aria-busy", "false");
   resultContent.innerHTML = `
     <div class="poem-output">
       <h3 class="poem-title">${escapeHtml(name)}，今晚的小詩</h3>
       ${lines}
+    </div>
+  `;
+  imageActions.classList.remove("hidden");
+  imagePanel.classList.add("hidden");
+  imageContent.innerHTML = "";
+}
+
+function renderImageLoading() {
+  imagePanel.classList.remove("hidden");
+  imagePanel.setAttribute("aria-busy", "true");
+  imageContent.innerHTML = '<p class="image-loading">小杜正在把詩畫成一張明信片……</p>';
+}
+
+function renderImageError() {
+  imagePanel.classList.remove("hidden");
+  imagePanel.setAttribute("aria-busy", "false");
+  imageContent.innerHTML = '<p class="image-error">圖片生成失敗，請稍後再試。</p>';
+}
+
+function renderImage(imageUrl) {
+  imagePanel.classList.remove("hidden");
+  imagePanel.setAttribute("aria-busy", "false");
+  imageContent.innerHTML = `
+    <div class="image-card">
+      <img class="generated-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(latestName)} 的新詩意象圖">
     </div>
   `;
 }
@@ -114,4 +175,26 @@ form.addEventListener("submit", async (event) => {
 
   submitButton.disabled = false;
   submitButton.textContent = "請小新寫詩";
+});
+
+generateImageButton.addEventListener("click", async () => {
+  if (!latestPoem) {
+    return;
+  }
+
+  generateImageButton.disabled = true;
+  generateImageButton.textContent = "生成中...";
+  renderImageLoading();
+  imagePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  try {
+    const imageUrl = await generateImage(latestPoem);
+    renderImage(imageUrl);
+  } catch (error) {
+    renderImageError();
+    console.error(error);
+  } finally {
+    generateImageButton.disabled = false;
+    generateImageButton.textContent = "生成意象圖";
+  }
 });
