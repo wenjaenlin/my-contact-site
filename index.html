@@ -23,20 +23,19 @@
 
     <section class="form-panel">
       <div class="form-heading">
-        <p class="section-kicker">留下聯絡方式</p>
-        <h2>讓名字落款，也讓故事開始。</h2>
+        <p class="section-kicker">名字新詩產生器</p>
+        <h2>把一個名字放進來，讓它長成一首詩。</h2>
       </div>
 
       <form
-        id="contact-form"
-        class="contact-form"
-        name="contact"
+        id="poem-form"
+        class="poem-form"
+        name="poem-request"
         method="POST"
-        action="/thank-you.html"
         data-netlify="true"
         netlify-honeypot="bot-field"
       >
-        <input type="hidden" name="form-name" value="contact">
+        <input type="hidden" name="form-name" value="poem-request">
         <p class="hidden-field">
           <label>
             請不要填寫這個欄位：
@@ -46,16 +45,18 @@
 
         <label class="field">
           <span>你的名字</span>
-          <input type="text" name="name" placeholder="請寫下你的名字" required>
+          <input id="name-input" type="text" name="name" placeholder="請寫下你的名字" maxlength="40" required>
         </label>
 
-        <label class="field">
-          <span>你的信箱</span>
-          <input type="email" name="email" placeholder="name@example.com" required>
-        </label>
-
-        <button type="submit" class="submit-button">把名字交給小新</button>
+        <button type="submit" class="submit-button">請小新寫詩</button>
       </form>
+    </section>
+
+    <section id="result-panel" class="result-panel" aria-live="polite" aria-busy="false">
+      <p class="section-kicker">詩的回聲</p>
+      <div id="result-content" class="result-content">
+        <p class="result-placeholder">你的名字會在這裡慢慢長出一首詩。</p>
+      </div>
     </section>
   </main>
 
