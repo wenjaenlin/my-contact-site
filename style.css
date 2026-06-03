@@ -1,11 +1,10 @@
 :root {
   --bg-color: #f7f3ed;
-  --paper-color: rgba(255, 252, 247, 0.88);
+  --paper-color: rgba(255, 252, 247, 0.9);
   --line-color: rgba(53, 43, 34, 0.12);
   --text-color: #241b14;
   --muted-color: #6b5b4f;
   --accent-color: #8d5f3c;
-  --accent-soft: #efe1d2;
   --shadow-color: rgba(66, 45, 26, 0.08);
 }
 
@@ -32,6 +31,7 @@ body {
 
 .hero-panel,
 .form-panel,
+.result-panel,
 .contact-card {
   border: 1px solid var(--line-color);
   border-radius: 32px;
@@ -45,6 +45,7 @@ body {
 }
 
 .form-panel,
+.result-panel,
 .contact-card {
   margin-top: 28px;
   padding: 40px 32px;
@@ -61,7 +62,8 @@ body {
 }
 
 h1,
-h2 {
+h2,
+.poem-title {
   margin: 0;
   font-family: "Noto Serif TC", serif;
   font-weight: 700;
@@ -90,7 +92,7 @@ h2 {
   margin-bottom: 28px;
 }
 
-.contact-form {
+.poem-form {
   display: grid;
   gap: 22px;
 }
@@ -160,6 +162,48 @@ h2 {
   cursor: wait;
 }
 
+.result-panel {
+  min-height: 260px;
+}
+
+.result-content {
+  color: var(--muted-color);
+}
+
+.result-placeholder,
+.result-loading,
+.result-error {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.result-loading {
+  color: var(--accent-color);
+}
+
+.result-error {
+  color: #9b3d29;
+}
+
+.poem-output {
+  display: grid;
+  gap: 14px;
+}
+
+.poem-title {
+  margin-bottom: 6px;
+  font-size: 1.35rem;
+  color: var(--text-color);
+}
+
+.poem-line {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.03rem;
+  line-height: 2;
+}
+
 .hidden-field {
   display: none;
 }
@@ -178,6 +222,7 @@ h2 {
   }
 
   .form-panel,
+  .result-panel,
   .contact-card {
     padding: 28px 20px;
     border-radius: 24px;
