@@ -30,6 +30,7 @@ body {
 }
 
 .hero-panel,
+.mood-panel,
 .form-panel,
 .result-panel,
 .contact-card {
@@ -44,6 +45,7 @@ body {
   padding: 64px 56px;
 }
 
+.mood-panel,
 .form-panel,
 .result-panel,
 .contact-card {
@@ -63,7 +65,8 @@ body {
 
 h1,
 h2,
-.poem-title {
+.poem-title,
+.mood-quote {
   margin: 0;
   font-family: "Noto Serif TC", serif;
   font-weight: 700;
@@ -88,8 +91,13 @@ h2 {
   line-height: 2;
 }
 
+.mood-heading,
 .form-heading {
   margin-bottom: 28px;
+}
+
+.mood-actions {
+  margin-bottom: 22px;
 }
 
 .poem-form {
@@ -183,10 +191,14 @@ h2 {
   min-height: 260px;
 }
 
+.mood-content,
 .result-content {
   color: var(--muted-color);
 }
 
+.mood-placeholder,
+.mood-loading,
+.mood-error,
 .result-placeholder,
 .result-loading,
 .result-error,
@@ -197,14 +209,22 @@ h2 {
   line-height: 1.9;
 }
 
+.mood-loading,
 .result-loading,
 .image-loading {
   color: var(--accent-color);
 }
 
+.mood-error,
 .result-error,
 .image-error {
   color: #9b3d29;
+}
+
+.mood-quote {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  line-height: 1.75;
+  color: var(--text-color);
 }
 
 .poem-output {
@@ -267,6 +287,7 @@ h2 {
     padding: 40px 24px;
   }
 
+  .mood-panel,
   .form-panel,
   .result-panel,
   .contact-card {
