@@ -1,6 +1,9 @@
 const form = document.getElementById("poem-form");
 const nameInput = document.getElementById("name-input");
 const submitButton = form.querySelector('button[type="submit"]');
+const moodPanel = document.querySelector(".mood-panel");
+const generateMoodButton = document.getElementById("generate-mood-button");
+const moodContent = document.getElementById("mood-content");
 const resultPanel = document.getElementById("result-panel");
 const resultContent = document.getElementById("result-content");
 const imageActions = document.getElementById("image-actions");
@@ -16,7 +19,7 @@ function escapeHtml(text) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -46,6 +49,24 @@ async function parseJsonSafely(response) {
   } catch {
     return { raw: text };
   }
+}
+
+async function generateMood() {
+  const response = await fetch("/api/generate-mood", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+
+  const data = await parseJsonSafely(response);
+
+  if (!response.ok) {
+    throw new Error(data.error || data.raw || "Mood generation failed.");
+  }
+
+  return data.mood;
 }
 
 async function generatePoem(name) {
@@ -82,6 +103,21 @@ async function generateImage(poem) {
   }
 
   return data.imageUrl;
+}
+
+function renderMoodLoading() {
+  moodPanel.setAttribute("aria-busy", "true");
+  moodContent.innerHTML = '<p class="mood-loading">小新正在聽今天的心情……</p>';
+}
+
+function renderMoodError(message) {
+  moodPanel.setAttribute("aria-busy", "false");
+  moodContent.innerHTML = `<p class="mood-error">${escapeHtml(message)}</p>`;
+}
+
+function renderMood(mood) {
+  moodPanel.setAttribute("aria-busy", "false");
+  moodContent.innerHTML = `<p class="mood-quote">${escapeHtml(mood)}</p>`;
 }
 
 function hideImageSection() {
@@ -146,6 +182,27 @@ function renderImage(imageUrl) {
     </div>
   `;
 }
+
+generateMoodButton.addEventListener("click", async () => {
+  generateMoodButton.disabled = true;
+  generateMoodButton.textContent = "聆聽中...";
+  renderMoodLoading();
+
+  try {
+    const mood = await generateMood();
+    renderMood(mood);
+  } catch (error) {
+    const message = error instanceof Error
+      ? error.message
+      : "今天的心情暫時沒有回聲，請稍後再試。";
+
+    renderMoodError(message);
+    console.error(error);
+  } finally {
+    generateMoodButton.disabled = false;
+    generateMoodButton.textContent = "今天的心情";
+  }
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
