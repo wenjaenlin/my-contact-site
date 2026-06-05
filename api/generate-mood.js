@@ -15,10 +15,36 @@ function normalizeQuote(text) {
   return text
     .replace(/\r/g, "")
     .replace(/\n+/g, "")
-    .replace(/\s+/g, "")
     .replace(/^[\u300c\u300e"\u201c]+/, "")
     .replace(/[\u300d\u300f"\u201d]+$/, "")
     .trim();
+}
+
+function trimToReasonableSentence(text, limit = 40) {
+  const chineseMatches = text.match(/[\u3400-\u9fff]/g);
+
+  if (!chineseMatches || chineseMatches.length <= limit) {
+    return text;
+  }
+
+  let chineseCount = 0;
+  let cutIndex = text.length;
+
+  for (let index = 0; index < text.length; index += 1) {
+    if (/[\u3400-\u9fff]/.test(text[index])) {
+      chineseCount += 1;
+    }
+
+    if (chineseCount >= limit) {
+      cutIndex = index + 1;
+      break;
+    }
+  }
+
+  const sliced = text.slice(0, cutIndex);
+  const sentenceEndMatch = sliced.match(/^.*?[。！？!?]/u);
+
+  return (sentenceEndMatch ? sentenceEndMatch[0] : sliced).trim();
 }
 
 function finalizeMood(text) {
@@ -28,13 +54,8 @@ function finalizeMood(text) {
     return "";
   }
 
-  const firstSentenceEnd = mood.search(/[。！？!?]/u);
-
-  if (firstSentenceEnd >= 0) {
-    mood = mood.slice(0, firstSentenceEnd + 1);
-  }
-
-  mood = mood.replace(/[，、：；,;:]+$/u, "").trim();
+  mood = trimToReasonableSentence(mood, 40);
+  mood = mood.replace(/[，、：；,;:]+$/u, "。").trim();
 
   if (!/[。！？!?]$/u.test(mood)) {
     mood = `${mood}。`;
@@ -43,20 +64,15 @@ function finalizeMood(text) {
   return mood;
 }
 
-function countChineseCharacters(text) {
-  const matches = text.match(/[\u3400-\u9fff]/g);
-  return matches ? matches.length : 0;
-}
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed." });
+    return res.status(405).json({ error: "今天的心情暫時沒有回聲，請稍後再試。" });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: "Missing GEMINI_API_KEY environment variable." });
+    return res.status(500).json({ error: "今天的心情暫時沒有回聲，請稍後再試。" });
   }
 
   try {
@@ -70,7 +86,7 @@ module.exports = async function handler(req, res) {
         system_instruction: {
           parts: [
             {
-              text: "請只用繁體中文回答。你只能輸出一句完整的人生格言，長度必須是 12 到 30 個中文字。句子必須語意完整、可以獨立成立，不要只寫半句，不要標題，不要解釋，不要換行，不要引號，不要以逗號、頓號或冒號結尾。若不是完整一句，請直接重寫成完整一句。"
+              text: "請只輸出一句完整的繁體中文人生格言，溫柔、有智慧、有同理心，12 到 35 個中文字，不要標題，不要解釋，不要換行。"
             }
           ]
         },
@@ -79,7 +95,7 @@ module.exports = async function handler(req, res) {
             role: "user",
             parts: [
               {
-                text: "一句話，有智慧與同理心的人生格言。請輸出一句簡短、溫柔、有智慧、有同理心、但不雞湯的完整繁體中文句子。"
+                text: "一句話，有智慧與同理心的人生格言"
               }
             ]
           }
@@ -95,25 +111,21 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error: data.error?.message || "Gemini API request failed."
+        error: "今天的心情暫時沒有回聲，請稍後再試。"
       });
     }
 
-    const mood = finalizeMood(extractText(data));
-    const chineseCharacterCount = countChineseCharacters(mood);
+    const rawMood = extractText(data);
+    const mood = finalizeMood(rawMood);
 
     if (!mood) {
-      return res.status(502).json({ error: "The model returned an empty mood reflection." });
-    }
-
-    if (chineseCharacterCount < 12 || chineseCharacterCount > 30) {
-      return res.status(502).json({ error: "The model returned an incomplete or invalid mood reflection." });
+      return res.status(502).json({ error: "今天的心情暫時沒有回聲，請稍後再試。" });
     }
 
     return res.status(200).json({ mood });
-  } catch (error) {
+  } catch {
     return res.status(500).json({
-      error: error instanceof Error ? error.message : "Unknown server error."
+      error: "今天的心情暫時沒有回聲，請稍後再試。"
     });
   }
 };
