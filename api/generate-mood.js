@@ -14,13 +14,38 @@ function extractText(data) {
 function normalizeQuote(text) {
   return text
     .replace(/\r/g, "")
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .join(" ")
-    .replace(/^[「『"“]+/, "")
-    .replace(/[」』"”]+$/, "")
+    .replace(/\n+/g, "")
+    .replace(/\s+/g, "")
+    .replace(/^[\u300c\u300e"\u201c]+/, "")
+    .replace(/[\u300d\u300f"\u201d]+$/, "")
     .trim();
+}
+
+function finalizeMood(text) {
+  let mood = normalizeQuote(text);
+
+  if (!mood) {
+    return "";
+  }
+
+  const firstSentenceEnd = mood.search(/[。！？!?]/u);
+
+  if (firstSentenceEnd >= 0) {
+    mood = mood.slice(0, firstSentenceEnd + 1);
+  }
+
+  mood = mood.replace(/[，、：；,;:]+$/u, "").trim();
+
+  if (!/[。！？!?]$/u.test(mood)) {
+    mood = `${mood}。`;
+  }
+
+  return mood;
+}
+
+function countChineseCharacters(text) {
+  const matches = text.match(/[\u3400-\u9fff]/g);
+  return matches ? matches.length : 0;
 }
 
 module.exports = async function handler(req, res) {
@@ -45,7 +70,7 @@ module.exports = async function handler(req, res) {
         system_instruction: {
           parts: [
             {
-              text: "請只用繁體中文回答。輸出一句簡短格言，語氣溫柔、有智慧、有同理心，不要雞湯感太重，不要超過 30 個中文字，不要加標題，不要加引號。"
+              text: "請只用繁體中文回答。你只能輸出一句完整的人生格言，長度必須是 12 到 30 個中文字。句子必須語意完整、可以獨立成立，不要只寫半句，不要標題，不要解釋，不要換行，不要引號，不要以逗號、頓號或冒號結尾。若不是完整一句，請直接重寫成完整一句。"
             }
           ]
         },
@@ -54,13 +79,13 @@ module.exports = async function handler(req, res) {
             role: "user",
             parts: [
               {
-                text: "一句話，有智慧與同理心的人生格言"
+                text: "一句話，有智慧與同理心的人生格言。請輸出一句簡短、溫柔、有智慧、有同理心、但不雞湯的完整繁體中文句子。"
               }
             ]
           }
         ],
         generationConfig: {
-          temperature: 0.9,
+          temperature: 0.8,
           maxOutputTokens: 80
         }
       })
@@ -74,10 +99,15 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const mood = normalizeQuote(extractText(data));
+    const mood = finalizeMood(extractText(data));
+    const chineseCharacterCount = countChineseCharacters(mood);
 
     if (!mood) {
       return res.status(502).json({ error: "The model returned an empty mood reflection." });
+    }
+
+    if (chineseCharacterCount < 12 || chineseCharacterCount > 30) {
+      return res.status(502).json({ error: "The model returned an incomplete or invalid mood reflection." });
     }
 
     return res.status(200).json({ mood });
